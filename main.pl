@@ -326,7 +326,8 @@ replace_char(X, Y, [Z|Xs], [Z|Ys]) :-
 % let's try to document every text comment we see
 % Later, we'll add public predicates that have no documentation
 document_file(InputFile, OutputFile, ModuleName, PublicPredicates, Ops, Sections) :-
-    phrase_from_file(seq(FileText), InputFile),
+    phrase_from_file(seq(FileText0), InputFile),
+    append(FileText0, "\n", FileText),
     phrase(documented_predicates(Predicates0, Ops), FileText),
     public_undocumented_predicates(Predicates0, Ops, PublicPredicates, PublicUndocumented),
     (   PublicUndocumented \= [],

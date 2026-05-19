@@ -243,8 +243,10 @@ process_file(Base, Output0, Sections, SearchWriteStream, File0) :-
     ( file_newer(File, Output) ->
       portray_color(blue, skip_file(File))
     ; portray_color(green, process_file(File)),
-      open(File, read, FileStream),
-      read_term(FileStream, Term, []),
+      setup_call_cleanup(
+          open(File, read, FileStream),
+          read_term(FileStream, Term, []),
+          close(FileStream)),
       (
 	Term = (:- module(ModuleName, PublicPredicates)) ->
 	(
@@ -253,8 +255,7 @@ process_file(Base, Output0, Sections, SearchWriteStream, File0) :-
 	    append_predicates_search_index(Output, PublicPredicates1, Ops, SearchWriteStream)
 	)
       ; true
-      ),
-      close(FileStream)
+      )
     ).
 
 process_file(Base0, Output0, Sections, SearchWriteStream, Dir0) :-

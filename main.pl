@@ -258,6 +258,7 @@ process_file(Base, Output0, Sections, SearchWriteStream, File0) :-
     ).
 
 process_file(Base0, Output0, Sections, SearchWriteStream, Dir0) :-
+    \+ omitted_top_level_dir(Base0, Dir0),
     append(Base0, [Dir0], DirSg),
     append(Output0, [Dir0], Output),
     path_segments(Dir, DirSg),
@@ -266,6 +267,18 @@ process_file(Base0, Output0, Sections, SearchWriteStream, Dir0) :-
     make_directory_path(OutputDir),
     directory_files(Dir, Files),
     maplist(process_file(DirSg, Output, Sections, SearchWriteStream), Files).
+
+process_file(Base0, _Output0, _Sections, _SearchWriteStream, Dir0) :-
+    omitted_top_level_dir(Base0, Dir0),
+    portray_color(blue, skip_omitted(Dir0)).
+
+omitted_top_level_dir(Base0, Dir0) :-
+    source_folder(S1),
+    source_lib_folder(S2),
+    canonicalize(S1, S2, SourceLibBase),
+    Base0 = SourceLibBase,
+    omit(Omit),
+    member(Dir0, Omit).
 
 predicates_clean([], [], []).
 predicates_clean([X|Xs], [X|Ys], Ops) :-
